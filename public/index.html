@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmoStock - Smart Stock Analysis Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #1a1f4e;
+            --bg-tertiary: #2d3566;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --accent: #00d4ff;
+            --accent-2: #ff006e;
+            --accent-3: #06ffa5;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Star Background Animation */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        .star.small {
+            width: 1px;
+            height: 1px;
+            opacity: 0.5;
+        }
+
+        .star.medium {
+            width: 2px;
+            height: 2px;
+            opacity: 0.7;
+        }
+
+        .star.large {
+            width: 3px;
+            height: 3px;
+            opacity: 0.9;
+        }
+
+        .galaxy {
+            position: absolute;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        header {
+            background: rgba(26, 31, 78, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-login:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-signup {
+            background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-signup:hover {
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #0099cc 100%);
+            color: var(--bg-primary);
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(45, 53, 102, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 2rem;
+            border-radius: 1rem;
+            transition: all 0.3s;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feature-card:hover {
+            background: rgba(45, 53, 102, 0.8);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Stock Screener Section */
+        .screener-section {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+        }
+
+        .screener-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: rgba(26, 31, 78, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .screener-table thead {
+            background: rgba(45, 53, 102, 0.8);
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .screener-table th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .screener-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .screener-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .screener-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .stock-symbol {
+            font-weight: 600;
+            color: var(--accent);
+            cursor: pointer;
+        }
+
+        .stock-symbol:hover {
+            text-decoration: underline;
+        }
+
+        .positive {
+            color: var(--accent-3);
+        }
+
+        .negative {
+            color: var(--accent-2);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(26, 31, 78, 0.8);
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            padding: 2rem;
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .close {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(45, 53, 102, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 0.5rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(45, 53, 102, 0.8);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .screener-table {
+                font-size: 0.9rem;
+            }
+
+            .screener-table th,
+            .screener-table td {
+                padding: 0.5rem;
+            }
+        }
+
+        .container {
+            display: none;
+        }
+
+        .container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Stars Background -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo">⭐ CosmoStock</div>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#screener">Screener</a>
+                    <a href="#analysis">Analysis Tools</a>
+                    <a href="#portfolio">Portfolio</a>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="btn-login" onclick="openModal('loginModal')">Login</button>
+                    <button class="btn-signup" onclick="openModal('signupModal')">Sign Up</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Smart Stock Analysis for NSE & BSE</h1>
+                <p>Professional trading tools and real-time market insights in an intuitive platform</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="openModal('signupModal')">Get Started Free</button>
+                    <button class="btn-secondary" onclick="scrollToSection('screener')">View Screener</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2 class="section-title">Powerful Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Live Stock Screener</h3>
+                    <p>Real-time NSE & BSE stock data with advanced filtering and search capabilities.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>Advanced Charts</h3>
+                    <p>Professional candlestick charts with 5+ technical indicators for precise analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Technical Analysis</h3>
+                    <p>RSI, MACD, Bollinger Bands, Moving Averages - all the tools you need.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💼</div>
+                    <h3>Portfolio Manager</h3>
+                    <p>Track your holdings, monitor gains/losses, and optimize your portfolio.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Strategy Tester</h3>
+                    <p>Backtest your trading strategies and validate them before risking real money.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized for speed with instant data loading and smooth interactions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stock Screener Section -->
+        <section class="screener-section" id="screener">
+            <h2 class="section-title">Live Stock Screener</h2>
+            <table class="screener-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Price</th>
+                        <th>Change %</th>
+                        <th>Volume</th>
+                        <th>Market Cap</th>
+                    </tr>
+                </thead>
+                <tbody id="screenerData">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Analysis Tools Section -->
+        <section class="screener-section" id="analysis">
+            <h2 class="section-title">Professional Analysis Tools</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Moving Average</h3>
+                    <p>20, 50, 200-day moving averages to identify trends and support/resistance levels.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>RSI Indicator</h3>
+                    <p>Relative Strength Index for identifying overbought/oversold conditions.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>MACD</h3>
+                    <p>Moving Average Convergence Divergence for momentum and trend changes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Bollinger Bands</h3>
+                    <p>Volatility and trend analysis with dynamic support and resistance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section style="padding: 4rem 2rem; text-align: center; background: radial-gradient(ellipse at center, rgba(255, 0, 110, 0.05) 0%, transparent 70%);">
+            <h2 class="section-title">Ready to Master the Markets?</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 2rem;">Join thousands of traders using CosmoStock for smarter trading decisions.</p>
+            <button class="btn-primary" onclick="openModal('signupModal')">Start Your Free Trial</button>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2024 CosmoStock. All rights reserved.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">Professional stock analysis platform for NSE & BSE markets</p>
+        </footer>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem;">Login to CosmoStock</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" required placeholder="••••••••">
+                </div>
+                <button class="btn-primary" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                Don't have an account? <a href="#" onclick="switchModal('loginModal', 'signupModal'); return false;" style="color: var(--accent);">Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem;">Create Your Account</h2>
+            <form onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" required placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" required placeholder="••••••••">
+                </div>
+                <button class="btn-primary" style="width: 100%;">Create Account</button>
+            </form>
+            <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                Already have an account? <a href="#" onclick="switchModal('signupModal', 'loginModal'); return false;" style="color: var(--accent);">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Create Star Background
+        function createStars() {
+            const starsContainer = document.getElementById('starsContainer');
+            const starCount = 200;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = `star ${['small', 'medium', 'large'][Math.floor(Math.random() * 3)]}`;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+
+            // Create galaxies
+            for (let i = 0; i < 5; i++) {
+                const galaxy = document.createElement('div');
+                galaxy.className = 'galaxy';
+                galaxy.style.width = (100 + Math.random() * 300) + 'px';
+                galaxy.style.height = galaxy.style.width;
+                galaxy.style.left = Math.random() * 100 + '%';
+                galaxy.style.top = Math.random() * 100 + '%';
+                galaxy.style.animationDelay = Math.random() * 20 + 's';
+                starsContainer.appendChild(galaxy);
+            }
+        }
+
+        // Sample Stock Data
+        const stocks = [
+            { symbol: 'TCS', price: 4250.50, change: 2.5, volume: '2.5M', market: '14.2T' },
+            { symbol: 'INFY', price: 2850.75, change: 1.8, volume: '1.8M', market: '12.1T' },
+            { symbol: 'RELIANCE', price: 3125.80, change: -0.5, volume: '3.2M', market: '15.8T' },
+            { symbol: 'HDFC', price: 2750.25, change: 3.2, volume: '1.5M', market: '9.2T' },
+            { symbol: 'WIPRO', price: 425.50, change: 1.2, volume: '5.8M', market: '3.5T' },
+            { symbol: 'ITC', price: 385.75, change: -1.3, volume: '12.5M', market: '5.2T' },
+            { symbol: 'LT', price: 3285.30, change: 2.8, volume: '0.8M', market: '4.1T' },
+            { symbol: 'MARUTI', price: 12450.00, change: 4.1, volume: '0.2M', market: '3.8T' },
+        ];
+
+        // Populate Stock Screener
+        function populateScreener() {
+            const tbody = document.getElementById('screenerData');
+            stocks.forEach(stock => {
+                const row = `
+                    <tr>
+                        <td><span class="stock-symbol" onclick="viewStock('${stock.symbol}')">${stock.symbol}</span></td>
+                        <td>₹${stock.price.toFixed(2)}</td>
+                        <td class="${stock.change > 0 ? 'positive' : 'negative'}">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</td>
+                        <td>${stock.volume}</td>
+                        <td>${stock.market}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function switchModal(closeId, openId) {
+            closeModal(closeId);
+            openModal(openId);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            alert('Login functionality will be connected to your Django backend');
+            closeModal('loginModal');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            alert('Signup functionality will be connected to your Django backend');
+            closeModal('signupModal');
+        }
+
+        function viewStock(symbol) {
+            alert(`View detailed chart for ${symbol} - Ready to connect to /stock/${symbol} route`);
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const signupModal = document.getElementById('signupModal');
+            if (event.target == loginModal) loginModal.style.display = 'none';
+            if (event.target == signupModal) signupModal.style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            populateScreener();
+        });
+    </script>
+</body>
+</html>
